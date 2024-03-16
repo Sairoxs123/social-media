@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body{
+            display: flex;
+            justify-content: center;
+        }
+
+        #main{
+            display: flex;
+            justify-content: center;
+            margin-top: 5%;
+            border: 2px solid white;
+            width: 70%;
+            height: 69%;
+            position: fixed;
+        }
+
+        * {
+            color: white;
+        }
+
+        #left {
+            width: 50%;
+
+        }
+
+        #right{
+            width: 50%;
+        }
+
+        #comments{
+            padding: 2%;
+            overflow-y: scroll;
+            max-height: 55vh;
+        }
+
+        #right, #left{
+            flex-basis: 200;
+        }
+
+        a {
+            text-decoration: none;
+            display: flex;
+        }
+
+        .details {
+            margin-top: -5%;
+            margin-left: 10%;
+        }
+
+        #left .post {
+            width: 100%;
+            height: auto;
+            margin-bottom: 2%;
+        }
+
+        #left .post .image {
+            height: 50%;
+        }
+
+        #left .post .like,
+        .dislike {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            width: auto;
+        }
+
+        #sendcomment{
+            margin: 5%;
+        }
+
+        #comment{
+            border-radius: 22px;
+            background: inherit;
+            padding: 3%;
+            width: 75%;
+        }
+
+        #send{
+            background: #0d6efd;
+            border-radius: 10px;
+            border: none;
+            margin-left: 3%;
+            padding: 2%;
+            transition: all 0.2s;
+        }
+
+        #send:hover{
+            outline: 2px solid #888888;
+            cursor: pointer;
+        }
+
+        .comment{
+            display: flex;
+            margin-top: 2%;
+        }
+
+        .img img{
+            border-radius: 50%;
+        }
+
+        button{
+            padding: 0.5% 1%;
+            font-size: 1em;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 99;
+        }
+
+        video{
+            z-index: -1;
+        }
+
+        .prev, .next{
+            position: absolute;
+            top: 40%;
+            color: white;
+            background-color: black;
+            border-radius: 50%;
+        }
+
+        .prev{
+            left: 0;
+        }
+
+        .next{
+            right: 50%;
+        }
+
+        .slide-index{
+            margin-top: 1%;
+            display: flex;
+            justify-content: center;
+            gap: 1%;
+        }
+
+        .circle{
+            border-radius: 50%;
+            height: 20px;
+            width: 20px;
+        }
+
+        .index-not-active{
+            background-color: grey;
+        }
+
+        .index-active{
+            background-color: white;
+        }
+
+    </style>
+</head>
+
+<body bgcolor="black">
+
+    <div id="main">
+        <div id="left">
+
+            {% if post.files.all|length > 1 %}
+
+
+            <div class="post">
+                <div class="posted_by" style="text-align: left; display: flex; padding: 1%;">
+                    <div class="img">
+                        {% if post.posted_by.photo %}
+                        <img src="{{ post.posted_by.photo.url }}" width="70" height="70">
+                        {% else %}
+                        <img src="https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg"
+                            width="70" height="70" alt="image not found">
+                        {% endif %}
+                    </div>
+                    <div class="name">
+                        <h1>{{ post.posted_by }}</h1>
+                    </div>
+                </div>
+                <div class="image" id="{{ post.id }}" ondblclick="likeMessage(`{{ post.id }}`)">
+                    {% for j in post.files.all %}
+                        {% if "mp4" in j.file.url %}
+                        <video autoplay loop height="300px" width="100%" muted controls class="slide-{{ post.id }}" style="display: none;">
+                            <source src="{{ j.file.url }}">
+                        </video>
+                        {% else %}
+                        <img src="{{ j.file.url }}" height="300px" width="100%" style="border-radius: 0; display: none;"
+                            class="slide-{{ post.id }}">
+                        {% endif %}
+                    {% endfor %}
+                    <button type="button" onclick="sliderPrevious(`{{ post.id }}`)" class="prev">❮</button>
+                    <button type="button" onclick="sliderNext(`{{ post.id }}`)" class="next">❯</button>
+                </div>
+                <div class="slide-index">
+                    {% for y in post.files.all|length|get_range %}
+                        <div class="circle slide-index-{{ post.id }} index-not-active"></div>
+                    {% endfor %}
+                </div>
+                <script>
+                    var blah = document.querySelectorAll(".slide-{{ post.id }}");
+                    blah[0].style.display = "block";
+                    blah[0].classList.add("active");
+                    var indexes = document.querySelectorAll(".slide-index-{{ post.id }}");
+                    indexes[0].classList.replace("index-not-active", "index-active");
+                </script>
+                <div class="options" style="text-align: left; font-size: 3em; display: flex;">
+                    <div id="like-{{post.id}}">
+                        {% if liked %}
+                        <button class="dislike" onclick="dislikeMessage(`{{ post.id }}`)">
+                            <svg aria-label="Unlike" class="x1lliihq x1n2onr6" color="rgb(255, 48, 64)" fill="rgb(255, 48, 64)" height="24"
+                                role="img" viewBox="0 0 48 48" width="30">
+                                <title>Unlike</title>
+                                <path
+                                    d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z">
+                                </path>
+                            </svg>
+                        </button>
+
+                        {% else %}
+
+                        <button class="like" onclick="likeMessage(`{{ post.id }}`)">
+                            <svg aria-label="Like" class="x1lliihq x1n2onr6" color="rgb(245, 245, 245)" fill="rgb(245, 245, 245)"
+                            height="24" role="img" viewBox="0 0 24 24" width="30">
+                                <title>Like</title>
+                                <path
+                                    d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                                </path>
+                            </svg>
+                        </button>
+
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="likes" style="margin-left: 2%;">
+                    <span id="likes-{{post.id}}">{{ post.likes.all|length }}</span> likes
+                </div>
+                <div class="caption" style="margin-left: 2%;">
+                    <p>
+                        {{ post.caption }}
+                    </p>
+                </div>
+            </div>
+
+
+            {% else %}
+
+            <div class="post">
+                <div class="posted_by" style="text-align: left; display: flex; padding: 1%;">
+                    <div class="img">
+                        {% if post.posted_by.photo %}
+                        <img src="{{ post.posted_by.photo.url }}" width="70" height="70">
+                        {% else %}
+                        <img src="https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg"
+                            width="70" height="70" alt="image not found">
+                        {% endif %}
+                    </div>
+                    <div class="name">
+                        <h1>{{ post.posted_by }}</h1>
+                    </div>
+                </div>
+                <div class="image" id="{{ post.id }}" ondblclick="likeMessage(`{{ post.id }}`)">
+                    {% for j in post.files.all %}
+                        {% if "mp4" in j.file.url %}
+                        <video autoplay loop height="300px" width="100%" muted controls>
+                            <source src="{{ j.file.url }}">
+                        </video>
+                        {% else %}
+                        <img src="{{ j.file.url }}" height="300px" width="100%" style="border-radius: 0;">
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="options" style="text-align: left; font-size: 3em; display: flex;">
+                    <div id="like-{{post.id}}">
+                        <button class="like" onclick="likeMessage(`{{ post.id }}`)">
+                            <svg aria-label="Like" class="x1lliihq x1n2onr6" color="rgb(245, 245, 245)"
+                                fill="rgb(245, 245, 245)" height="24" role="img" viewBox="0 0 24 24" width="30">
+                                <title>Like</title>
+                                <path
+                                    d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="likes" style="margin-left: 2%;">
+                    <span id="likes-{{post.id}}">{{ post.likes|length }}</span> likes
+                </div>
+                <div class="caption" style="margin-left: 2%;">
+                    <p>
+                        {{ post.caption }}
+                    </p>
+                </div>
+            </div>
+
+            {% endif %}
+
+
+        </div>
+
+        <div id="right">
+
+
+            <div id="comments">
+                {% for i in comments %}
+                    <span class="comment">
+                        <div class="img">
+                            {% if i.commented_by.photo %}
+                            <img src="{{ i.commented_by.photo.url }}" width="70" height="70">
+                            {% else %}
+                            <img src="https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg"
+                                width="70" height="70" alt="image not found">
+                            {% endif %}
+                        </div>
+                        <div class="content" style="margin-left: 2%;">
+                            <div class="username" style="display: flex;">
+                                <h3>{{ i.commented_by.username }}</h3>
+                            </div>
+                            <div class="message">
+                                {{ i.comment }}
+                            </div>
+                        </div>
+                    </span>
+                {% endfor %}
+            </div>
+
+
+
+            <div id="sendcomment">
+                <input type="text" id="comment" maxlength="1000" placeholder="Comment..">
+                <button id="send" onclick="sendcomment()">Send</button>
+            </div>
+
+
+        </div>
+    </div>
+
+    <script>
+
+        document.getElementById("comment").onkeypress = (e) => {
+            if (e.keyCode === 13){
+                sendcomment();
+            }
+        }
+
+        function scroll(){
+            let div = document.getElementById("comments");
+            div.scrollTo({
+                top: div.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+
+        window.onload = scroll();
+
+        async function sendcomment(){
+            let postid = `{{ post.id }}`;
+            let comment = document.getElementById('comment').value;
+            if (comment == ""){
+                alert("Please enter a comment!");
+            } else {
+                let request = await fetch(`{% url 'sendcomment' %}?postid=${postid}&comment=${comment}`);
+                let data = await request.text();
+                let comments = data.split("</span>");
+                document.getElementById("comments").innerHTML = "";
+                for (let i = 0; i < comments.length; i++){
+                    document.getElementById("comments").innerHTML += `${comments[i]}</span>`
+                }
+                document.getElementById('comment').value = "";
+                scroll()
+            }
+        }
+
+        function sliderNext(id) {
+            let slides = document.querySelectorAll(`.slide-${id}`);
+            let indexes = document.querySelectorAll(`.slide-index-${id}`);
+            let index, indexing;
+            for (let i = 0; i < slides.length; i++){
+                if (slides[i].classList.contains("active")){
+                    slides[i].classList.remove("active");
+                    index = i;
+                    indexes[i].classList.replace("index-active", "index-not-active");
+                    indexing = i;
+                    break;
+                }
+            }
+
+            index++;
+
+            if (index > slides.length - 1){
+                index = 0;
+            }
+
+            for (let i = 0; i < slides.length; i++){
+                slides[i].style.display = "none";
+            }
+
+            slides[index].style.display = "block";
+            slides[index].classList.add("active");
+            indexes[index].classList.replace("index-not-active", "index-active")
+
+        }
+
+
+        function sliderPrevious(id){
+            let slides = document.querySelectorAll(`.slide-${id}`);
+            let indexes = document.querySelectorAll(`.slide-index-${id}`);
+            let index, indexing;
+            for (let i = 0; i < slides.length; i++){
+                if (slides[i].classList.contains("active")){
+                    slides[i].classList.remove("active");
+                    index = i;
+                    indexes[i].classList.replace("index-active", "index-not-active");
+                    indexing = i;
+                    break;
+                }
+            }
+
+            index--;
+
+            if (index < 0){
+                index = slides.length - 1;
+            }
+
+            for (let i = 0; i < slides.length; i++){
+                slides[i].style.display = "none";
+            }
+
+            slides[index].style.display = "block";
+            slides[index].classList.add("active");
+            indexes[index].classList.replace("index-not-active", "index-active")
+        }
+
+        function likeMessage(id) {
+            var postId = Number(id);
+            $.ajax({
+                url: "{% url 'like' %}",
+                type: "GET",
+                contentType: "text/javascript",
+                data: {
+                    'postid': postId
+                },
+                success: function (response) {
+                    document.getElementById(`likes-${postId}`).innerHTML++;
+                },
+                error: function () { console.log() }
+            });
+            document.getElementById(`like-${id}`).innerHTML = `
+            <button class="dislike" onclick="dislikeMessage(${postId})">
+    <svg aria-label="Unlike" class="x1lliihq x1n2onr6" color="rgb(255, 48, 64)" fill="rgb(255, 48, 64)" height="24"
+        role="img" viewBox="0 0 48 48" width="30">
+        <title>Unlike</title>
+        <path
+            d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z">
+        </path>
+    </svg>
+</button>
+            `
+            document.getElementById(id).removeAttribute("ondblclick");
+        }
+
+        function dislikeMessage(id) {
+            var postId = Number(id);
+            $.ajax({
+                url: "{% url 'dislike' %}",
+                type: "GET",
+                contentType: "text/javascript",
+                data: {
+                    'postid': postId
+                },
+                success: function (response) {
+                    document.getElementById(`likes-${postId}`).innerHTML--;
+                },
+                error: function () { alert("error"); }
+            });
+            document.getElementById(`like-${id}`).innerHTML = `
+                        <button class="like" onclick="likeMessage(${postId})">
+                            <svg aria-label="Like" class="x1lliihq x1n2onr6" color="rgb(245, 245, 245)" fill="rgb(245, 245, 245)"
+                            height="24" role="img" viewBox="0 0 24 24" width="30">
+                                <title>Like</title>
+                                <path
+                                    d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                                </path>
+                            </svg>
+                        </button>
+                        `
+
+            document.getElementById(id).setAttribute("ondblclick", `likeMessage(${id})`)
+        }
+    </script>
+
+</body>
+
+</html>

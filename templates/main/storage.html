@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Document</title>
+    <style>
+        * {
+            color: white;
+        }
+
+        #left,
+        #right {
+            position: fixed;
+            border: 2px solid white;
+        }
+
+        #right {
+            right: 0;
+            width: 20%;
+            padding: 1%;
+            margin-top: 10%;
+            text-align: center;
+        }
+
+        #left {
+            width: 15%;
+            height: 95%;
+        }
+
+        #center {
+            width: 60%;
+            position: absolute;
+            left: 17%;
+        }
+
+        a {
+            text-decoration: none;
+            display: flex;
+        }
+
+        #right .chats {
+            margin-left: 10%;
+            margin-top: 15%;
+        }
+
+        #right .chat {
+            margin-top: 5%;
+        }
+
+        img {
+            border-radius: 50%;
+        }
+
+        .details {
+            margin-top: -5%;
+            margin-left: 10%;
+        }
+
+        #center .post {
+            border: 2px solid white;
+            width: 60%;
+            margin-left: 25%;
+            margin-top: 5%;
+            height: auto;
+            margin-bottom: 2%;
+        }
+
+        #center .post .image {
+            height: 50%;
+        }
+
+        #left .user-details {
+            display: flex;
+        }
+
+        #center .post .like,
+        .dislike {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            width: auto;
+        }
+    </style>
+</head>
+
+<body bgcolor="black">
+
+    <div id="left">
+        <div class="user-details">
+            <div class="pfp">
+                {% if filename == "default" %}
+                <img src="https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg"
+                    alt="" width="56" height="56">
+                {% else %}
+                <img src="{{ filename }}" alt="" width="56" height="56">
+                {% endif %}
+            </div>
+            <div class="name">
+                <h2 id="user"> {{ username }} </h2>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="">
+                <h3>Home</h3>
+            </a>
+            <a href="">
+                <h3>Chat</h3>
+            </a>
+            <a href="{% url 'create' %}">
+                <h3>Create</h3>
+            </a>
+            <a href="{% url 'logout' %}">
+                <h3>Logout</h3>
+            </a>
+        </div>
+
+    </div>
+
+    <div id="center">
+
+        {% if user.following|length > 1 %}
+
+
+        {% for i in posts %}
+
+        {% if i.id in unliked %}
+
+        <div class="post">
+            <div class="posted_by" style="text-align: left; display: flex; padding: 1%;">
+                <div class="img">
+                    {% if i.posted_by.photo %}
+                    <img src="{{ i.posted_by.photo.url }}" width="70" height="70">
+                    {% else %}
+                    <img src="https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg"
+                        width="70" height="70" alt="image not found">
+                    {% endif %}
+                </div>
+                <div class="name">
+                    <h1>{{ i.posted_by }}</h1>
+                </div>
+            </div>
+            <div class="image">
+                {% if "mp4" in i.photo.url %}
+                <video autoplay loop height="300px" width="100%" muted controls>
+                    <source src="{{ i.photo.url }}">
+                </video>
+                {% else %}
+                <img src="{{ i.photo.url }}" height="300px" width="100%" style="border-radius: 0;"
+                    ondblclick="likeMessage(`{{ i.id }}`)" id="{{ i.id }}">
+                {% endif %}
+            </div>
+            <div class="options" style="text-align: left; font-size: 3em; display: flex;">
+                <div id="like-{{i.id}}">
+                    <button class="like" onclick="likeMessage(`{{ i.id }}`)">
+                        <svg aria-label="Like" class="x1lliihq x1n2onr6" color="rgb(245, 245, 245)"
+                            fill="rgb(245, 245, 245)" height="24" role="img" viewBox="0 0 24 24" width="30">
+                            <title>Like</title>
+                            <path
+                                d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+
+                <a href="/post/{{ i.id }}" style="margin-top: 3.5%; margin-left: 1%;" target="_blank">
+                    <svg aria-label="Comment" class="x1lliihq x1n2onr6" color="rgb(245, 245, 245)"
+                        fill="rgb(245, 245, 245)" height="24" role="img" viewBox="0 0 24 24" width="30">
+                        <title>Comment</title>
+                        <path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none" stroke="currentColor"
+                            stroke-linejoin="round" stroke-width="2"></path>
+                    </svg>
+                </a>
+            </div>
+            <div class="likes" style="margin-left: 2%;">
+                <span id="likes-{{i.id}}">{{ i.likes }}</span> likes
+            </div>
+            <div class="caption" style="margin-left: 2%;">
+                <p>
+                    {{ i.caption }}
+                </p>
+            </div>
+        </div>
+
+        {% endif %}
+
+        {% endfor %}
+
+        {% else %}
+
+        <div id="message">
+            <center>
+                <h1>You are not following any account. Follow accounts to view content.</h1>
+            </center>
+        </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+    <div id="right">
+        <h1 style="text-align: center;text-decoration: underline;">Recent Chats</h1>
+
+        <div class="chats">
+            {% for i in chats %}
+            {{ i|safe }}
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <script>
+
+        function likeMessage(id) {
+            var likedBy = document.getElementById("user").innerHTML;
+            var postId = Number(id);
+            $.ajax({
+                url: "{% url 'like' %}",
+                type: "GET",
+                contentType: "text/javascript",
+                data: {
+                    'postid': postId, 'likedby': likedBy
+                },
+                success: function (response) {
+                    document.getElementById(`likes-${postId}`).innerHTML++;
+                },
+                error: function () { console.log() }
+            });
+            document.getElementById(`like-${id}`).innerHTML = `
+            <button class="dislike" onclick="dislikeMessage(${postId})">
+    <svg aria-label="Unlike" class="x1lliihq x1n2onr6" color="rgb(255, 48, 64)" fill="rgb(255, 48, 64)" height="24"
+        role="img" viewBox="0 0 48 48" width="30">
+        <title>Unlike</title>
+        <path
+            d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z">
+        </path>
+    </svg>
+</button>
+            `
+            document.getElementById(id).removeAttribute("ondblclick");
+        }
+
+        function dislikeMessage(id) {
+            var likedBy = document.getElementById("user").innerHTML;
+            var postId = Number(id);
+            $.ajax({
+                url: "{% url 'dislike' %}",
+                type: "GET",
+                contentType: "text/javascript",
+                data: {
+                    'postid': postId, 'likedby': likedBy
+                },
+                success: function (response) {
+                    document.getElementById(`likes-${postId}`).innerHTML--;
+                },
+                error: function () { alert("error"); }
+            });
+            document.getElementById(`like-${id}`).innerHTML = `
+                        <button class="like" onclick="likeMessage(${postId})">
+                            <svg aria-label="Like" class="x1lliihq x1n2onr6" color="rgb(245, 245, 245)" fill="rgb(245, 245, 245)"
+                            height="24" role="img" viewBox="0 0 24 24" width="30">
+                                <title>Like</title>
+                                <path
+                                    d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 3.679-1.938m0-2a6.04 6.04 0 0 0-4.797 2.127 6.052 6.052 0 0 0-4.787-2.127A6.985 6.985 0 0 0 .5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 0 0 3.518 3.018 2 2 0 0 0 2.174 0 45.263 45.263 0 0 0 3.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 0 0-6.708-7.218Z">
+                                </path>
+                            </svg>
+                        </button>
+                        `
+
+            document.getElementById(id).setAttribute("ondblclick", `likeMessage(${id})`)
+        }
+
+    </script>
+
+</body>
+
+</html>

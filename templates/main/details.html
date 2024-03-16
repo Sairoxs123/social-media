@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <h1>Followers: {{ followers|length }}</h1>
+
+    {% if requested == True %}
+    <button type="button" id="follow-btn" onclick="derequest()">Requested</button>
+    {% elif following == True %}
+    <button type="button" id="follow-btn" onclick="unfollow()">Following</button>
+    {% else %}
+    <button type="button" id="follow-btn" onclick="follow()">Follow</button>
+    {% endif %}
+
+    <script>
+        function follow(){
+            let followid = `{{ user.id }}`;
+            $.ajax({
+                url: "{% url 'follow' %}",
+                type: "GET",
+                contentType: "text/javascript",
+                data: {
+                    'followid': followid
+                },
+                success: (res) => {
+                    document.getElementById("follow-btn").innerHTML = res;
+                    document.getElementById("follow-btn").setAttribute("onclick", "derequest()");
+                }
+            })
+        }
+
+        function unfollow(){
+            let followid = `{{ user.id }}`;
+            $.ajax({
+                url: "{% url 'unfollow' %}",
+                type: "GET",
+                contentType: "text/javascript",
+                data: {
+                    'followid': followid
+                },
+                success: (res) => {
+                    document.getElementById("follow-btn").innerHTML = "Follow";
+                    document.getElementById("follow-btn").setAttribute("onclick", "follow()");
+                }
+            })
+        }
+
+        function derequest(){
+            let followid = `{{ user.id }}`;
+            $.ajax({
+                url: "{% url 'remfollowreq' %}",
+                type: "GET",
+                contentType: "text/javascript",
+                data: {
+                    'followid': followid
+                },
+                success: (res) => {
+                    document.getElementById("follow-btn").innerHTML = "Follow";
+                    document.getElementById("follow-btn").setAttribute("onclick", "follow()");
+                }
+            })
+        }
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .select {
+            background: none;
+            border: none;
+        }
+
+        .selected{
+            background-color: cyan;
+        }
+
+        .user{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .name{
+            font-size: 1.5em;
+        }
+
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+        }
+
+        form{
+            text-align: center;
+            max-width: 30vw;
+        }
+
+        #users-select{
+            max-width: inherit;
+            overflow-y: scroll;
+            max-height: 20vh;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="{% url 'create-group' %}" method="post" id="create">
+        {% csrf_token %}
+
+        <label>Name of the group: </label>
+        <input type="text" name="name" placeholder="Name: " form="create">
+
+        <br><br>
+
+        <label>Select users: </label>
+
+        <br>
+
+        <div id="users-select">
+            {% for i in users %}
+                {% if i.username != username %}
+                    <button type="button" onclick="selectedUsers(`{{ i }}`, `{{ i.id }}`)" class="select" id="btn-{{ i.id }}">
+                        <div class="user">
+                            <input type="checkbox" name="user" value="{{ i }}" id="{{ i.id }}">
+                            {% if i.file.url %}
+                                <img src="{{ i.file.url }}" height="56" width="56" style="border-radius: 50%;">
+                            {% else %}
+                                <img src="https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg" height="56" width="56" style="border-radius: 50%;">
+                            {% endif %}
+                            <div class="name">
+                                {{i}}
+                            </div>
+                        </div>
+                    </button>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div id="users"></div>
+
+        <br><br>
+
+        <button type="submit" id="submit" disabled>Submit</button>
+
+    </form>
+
+    <script>
+
+        let users = [`Sai Teja`];
+
+        function selectedUsers(name, id) {
+            const check = document.getElementById(id);
+            if (check.checked) {
+                if (users.includes(name) === false) {
+                    users.push(name);
+                    document.getElementById(`btn-${id}`).classList.add("selected")
+                }
+            } else {
+                const pos = users.indexOf(name);
+                if (pos > -1) {
+                    users.splice(pos, 1);
+                    document.getElementById(`btn-${id}`).classList.remove("selected");
+                }
+            }
+
+            if (users.length > 1){
+                document.getElementById("submit").removeAttribute("disabled");
+            } else {
+                document.getElementById("submit").setAttribute("disabled", "true");
+            }
+
+            document.getElementById('users').innerHTML = `<input type="hidden" name="users" value="${users}" form="create">`;
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+        body{
+            display: flex;
+            width: 100%;
+            background-color: black;
+            color: white;
+        }
+
+        img {
+            border-radius: 50%;
+        }
+
+        #nav{
+            width: 15%;
+            border: 2px solid white;
+            position: fixed;
+            height: 98%;
+        }
+
+        #main{
+            width: 70%;
+            position: fixed;
+        }
+
+        #nav .user-details {
+            display: flex;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div id="nav">
+
+        <div class="user-details">
+            <div class="pfp">
+
+                <img src="https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg"
+                    alt="" width="56" height="56">
+
+            </div>
+            <div class="name">
+                <h2 id="user"> Sai Teja </h2>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="">
+                <h3>Home</h3>
+            </a>
+            <a href="">
+                <h3>Chat</h3>
+            </a>
+        </div>
+
+    </div>
+
+    <div id="main"></div>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="{% url 'login' %}" method="post">
+
+        {% csrf_token %}
+
+        <p>
+            <input type="text" name="username" class="form-control" placeholder="Username: " maxlength="10" required
+                id="id_username">
+        </p>
+
+
+        <p>
+            <input type="password" name="password" class="form-control" placeholder="Password: " maxlength="30" required
+                id="id_password">
+        </p>
+
+        <br>
+
+        <button class="btn btn-primary">Submit</button>
+
+        <br><br>
+
+        <p>
+            Don't have account? <a href="{% url 'signup' %}">Signup</a>
+        </p>
+
+    </form>
+</body>
+</html>

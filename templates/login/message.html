@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    {% if message == "wrongpassword" %}
+        <h1>
+            Wrong password
+        </h1>
+    {% elif message == "account-no-exist" %}
+        <h1>
+            Acount doesn't exist.
+        </h1>
+    {% endif %}
+
+</body>
+</html>

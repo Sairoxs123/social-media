@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SlideShow</title>
+    <style>
+
+        .container{
+            position: relative;
+        }
+
+        button{
+            padding: 0.5% 1%;
+            font-size: 1.5em;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 99;
+        }
+
+        video{
+            z-index: -1;
+        }
+
+        .prev, .next{
+            position: absolute;
+            top: 40%;
+            color: white;
+            background-color: black;
+            border-radius: 50%;
+        }
+
+        .prev{
+            left: 1%;
+        }
+
+        .next{
+            right: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="1">
+        <video src="/media/posts/WhatsApp_Video_2024-01-21_at_19.19.09_d9fff7ba.mp4" autoplay loop muted controls class="slide-1 active"></video>
+        <video src="/media/posts/bintu.mp4" autoplay loop muted style="display: none;" controls class="slide-1"></video>
+        <br>
+        <button type="button" onclick="sliderPrevious(1)" class="prev">❮</button>
+        <button type="button" onclick="sliderNext(1)" class="next">❯</button>
+    </div>
+
+    <br><br>
+
+    <div class="container" id="2">
+        <video src="/media/posts/WhatsApp_Video_2024-01-21_at_19.19.09_d9fff7ba.mp4" autoplay loop muted controls class="slide-2 active"></video>
+        <video src="/media/posts/bintu.mp4" autoplay loop muted style="display: none;" controls class="slide-2"></video>
+        <br>
+        <button type="button" onclick="sliderPrevious(2)" class="prev">❮</button>
+        <button type="button" onclick="sliderNext(2)" class="next">❯</button>
+    </div>
+
+    <script>
+        function sliderNext(id) {
+            let slides = document.querySelectorAll(`.slide-${id}`);
+            let index;
+            for (let i = 0; i < slides.length; i++){
+                if (slides[i].classList.contains("active")){
+                    slides[i].classList.remove("active");
+                    index = i;
+                    break;
+                }
+            }
+
+            index++;
+
+            if (index > slides.length - 1){
+                index = 0;
+            }
+
+            for (let i = 0; i < slides.length; i++){
+                slides[i].style.display = "none";
+            }
+
+            slides[index].style.display = "block";
+            slides[index].classList.add("active");
+
+        }
+
+
+        function sliderPrevious(id){
+            let slides = document.querySelectorAll(`.slide-${id}`);
+            let index;
+            for (let i = 0; i < slides.length; i++){
+                if (slides[i].classList.contains("active")){
+                    slides[i].classList.remove("active");
+                    index = i;
+                    break;
+                }
+            }
+
+            console.log(index);
+
+            index--;
+
+            if (index < 0){
+                index = slides.length - 1;
+            }
+
+            for (let i = 0; i < slides.length; i++){
+                slides[i].style.display = "none";
+            }
+
+            slides[index].style.display = "block";
+            slides[index].classList.add("active");
+        }
+
+    </script>
+
+</body>
+</html>
